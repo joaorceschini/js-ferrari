@@ -1,6 +1,12 @@
+  
+import firebase from './firebase-app';
+import { getFormValues, hideAlertError, showAlertError } from './utils';
+
 const authPage = document.querySelector('main#auth')
 
 if(authPage){
+
+    const auth = firebase.auth();
 
     const hideAuthForms = () => {
 
@@ -36,7 +42,8 @@ if(authPage){
                 showAuthForm('reset')
                 break
             default :
-                showAuthForm('auth-email')
+                //showAuthForm('auth-email')
+                showAuthForm('login')
         }
     }
 
@@ -61,5 +68,62 @@ if(authPage){
         location.hash = '#login'
         btnSubmit.disabled = false
         
+    })
+
+    const formAuthRegister = document.querySelector("#register")
+
+    formAuthRegister.addEventListener("submit", e => {
+
+        e.preventDefault()
+
+        hideAlertError(formAuthRegister)
+
+        const values = getFormValues(formAuthRegister)
+
+        auth
+            .createUserWithEmailAndPassword(values.email, values.password)
+            .then(response => {
+
+                const { user } = response
+
+                user.updateProfile({
+                    displayName: values.name
+                })
+
+                window.location.href = "/"
+
+            })
+            .catch(showAlertError(formAuthRegister))
+
+    })
+
+    const formAuthLogin = document.querySelector("#login")
+
+    formAuthLogin.addEventListener("submit", e => {
+
+        e.preventDefault()
+
+        hideAlertError(formAuthLogin)
+
+        const values = getFormValues(formAuthLogin)
+
+        auth
+            .signInWithEmailAndPassword(values.email, values.password)
+            .then(response => window.location.href = "/")
+            .catch(showAlertError(formAuthLogin))
+
+    })
+
+    document.querySelector('#login .facebook').addEventListener("click", e => {
+
+        const provider = new firebase.auth.FacebookAuthProvider();
+
+        auth.signInWithRedirect(provider);
+        /*
+        auth
+            .signInWithPopup(provider)
+            .then( window.location.href = "/")
+            .catch(showAlertError(formAuthLogin));
+        */
     })
 }
