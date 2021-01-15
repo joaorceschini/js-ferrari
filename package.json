@@ -1,0 +1,24 @@
+{
+  "name": "ferrari-2.0",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "sass": "sass --watch public/assets/sass/main.scss:public/assets/css/main.css",
+    "sass-build": "sass public/assets/sass/main.scss:public/assets/css/main.css --style=compressed",
+    "build": "webpack --mode=production",
+    "dev": "webpack serve --watch --content-base public --hot"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.32.4",
+    "webpack": "^5.13.0",
+    "webpack-cli": "^4.3.1",
+    "webpack-dev-server": "^3.11.1"
+  },
+  "dependencies": {
+    "date-fns": "^2.16.1"
+  }
+}
