@@ -1,4 +1,3 @@
-import { differenceInCalendarISOWeekYears } from 'date-fns';
 import firebase from './firebase-app';
 import { getFormValues, getQueryString, hideAlertError, showAlertError } from './utils';
 
@@ -124,7 +123,7 @@ if(authPage){
                     if (window.location.hostname === 'localhost') {
                         window.location.href = `http://localhost:8080${values.url}`
                     } else {
-                        window.location.href = `http://jrvrc-ferrari.web.app${values.url}`
+                        window.location.href = `https://ferrari-jrangel.web.app${values.url}`
                     }
                 } else {
                     window.location.href = "/"

@@ -121,3 +121,17 @@ export function onSnapshotError(err) {
     window.location.href = `/auth.html?url=${pathname}${search}`;
 
 }
+
+export function getQueryStringFromJSON(json) {
+
+    const params = []
+
+    Object.keys(json).forEach(key => {
+
+        params.push(`${key}=${json[key]}`)
+
+    })
+
+    return params.join("&")
+
+}
