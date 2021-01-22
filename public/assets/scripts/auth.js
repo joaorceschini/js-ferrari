@@ -1,3 +1,4 @@
+import { differenceInCalendarISOWeekYears } from 'date-fns';
 import firebase from './firebase-app';
 import { getFormValues, getQueryString, hideAlertError, showAlertError } from './utils';
 
@@ -120,7 +121,11 @@ if(authPage){
                 const values = getQueryString()
 
                 if (values.url) {
-                    window.location.href = `http://localhost:8080${values.url}`
+                    if (window.location.hostname === 'localhost') {
+                        window.location.href = `http://localhost:8080${values.url}`
+                    } else {
+                        window.location.href = `http://jrvrc-ferrari.web.app${values.url}`
+                    }
                 } else {
                     window.location.href = "/"
                 }
@@ -196,9 +201,8 @@ if(authPage){
             .verifyPasswordResetCode(oobCode)
             .then(() => auth.confirmPasswordReset(oobCode, password))
             .then(() => {
-
-                window.location.href = "/";
-
+                hideAuthForms()
+                showAuthForm('login')
             })
             .catch(showAlertError(formReset))
             .finally(() => {
