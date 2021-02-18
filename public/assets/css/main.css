@@ -1206,6 +1206,7 @@ header.page-title hr {
   margin-bottom: 1rem;
   border: 1px solid transparent;
   border-radius: var(--border-radius);
+  display: none;
 }
 .alert.danger {
   color: var(--danger-color);

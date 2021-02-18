@@ -4,52 +4,26 @@ import firebase from './firebase-app'
 document.querySelectorAll('#change-photo').forEach(page => {
 
     let cropper = null
+    let userGlobal = null
     const imageElement = page.querySelector('#photo-preview')
     const buttonElement = page.querySelector('.choose-photo')
     const inputFileElement = page.querySelector('#file')
     const form = imageElement.closest('form')
     const btnSubmit = form.querySelector("[type=submit]")
+    const bodyElement =  document.body;
 
-    form.addEventListener("submit", e => {
+    const auth = firebase.auth()
 
-        e.preventDefault()
-
-        form.classList.remove("cropping")
-
-        btnSubmit.disabled = true
-        btnSubmit.innerHTML = "Salvando..."
-
-        imageElement.src = cropper.getCroppedCanvas().toDataURL("image/png")
-
-        const blob = cropper.getCroppedCanvas().toBlob(blob => {
-            const storage = firebase.storage()
-    
-            const fileRef = storage.ref().child("photos/user.png")
-    
-            fileRef
-                .put(blob)
-                .then(snapshot => snapshot.ref.getDownloadURL())
-                .then(url => console.log(url))
-    
-            cropper.destroy()
-        })
-
-
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            userGlobal = user
+            imageElement.src = user.photoURL || "https://i.pravatar.cc/256"
+        }
     })
 
-    imageElement.addEventListener('click', () => {
-        inputFileElement.click()
-    })
-
-    buttonElement.addEventListener('click', () => {
-        inputFileElement.click()
-    })
-
-    inputFileElement.addEventListener('change', e => {
-
-        if (e.target.files.length) {
-
-            const file = e.target.files[0]
+    const uploadFile = files => {
+        if (files.length) {
+            const file = files[0]
 
             const reader = new FileReader()
 
@@ -67,11 +41,59 @@ document.querySelectorAll('#change-photo').forEach(page => {
 
             reader.readAsDataURL(file);
 
-            e.target.value = "";
-
         }
+    }
+
+    bodyElement.addEventListener("drop", e => {
+        e.preventDefault()
+        uploadFile(e.dataTransfer.files)
+    })
+
+    bodyElement.addEventListener("dragover", e => e.preventDefault())
+
+    form.addEventListener("submit", e => {
+
+        e.preventDefault()
+
+        form.classList.remove("cropping")
+
+        btnSubmit.disabled = true
+        btnSubmit.innerHTML = "Salvando..."
+
+        imageElement.src = cropper.getCroppedCanvas().toDataURL("image/png")
+
+        const blob = cropper.getCroppedCanvas().toBlob(blob => {
+            const storage = firebase.storage()
+    
+            const fileRef = storage.ref().child(`photos/${userGlobal.uid}.png`)
+    
+            fileRef
+                .put(blob)
+                .then(snapshot => snapshot.ref.getDownloadURL())
+                .then(photoURL => userGlobal.updateProfile({ photoURL }))
+                .then(() => {
+                    document.querySelector("#header > div.menu.logged > div > div > picture > a > img").src = userGlobal.photoURL
+                    userGlobal.photoURL
+                    console.log("Foto atualizada")
+                })
+    
+            cropper.destroy()
+        })
 
 
+    })
+
+    imageElement.addEventListener('click', () => {
+        inputFileElement.click()
+    })
+
+    buttonElement.addEventListener('click', () => {
+        inputFileElement.click()
+    })
+
+    inputFileElement.addEventListener('change', e => {
+        uploadFile(e.target.files)
+        e.target.value = "";
     })
 
 })
